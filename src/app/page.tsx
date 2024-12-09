@@ -1,101 +1,328 @@
-import Image from "next/image";
+import { Card } from "@/components/card";
+import { FileTree } from "@/components/file-tree";
+import { FileTreeItem } from "@/components/file-tree-item";
+import type { FileTreeItem as FileTreeItemType } from "@/types/file-tree-item";
+import { cn } from "@/utils/cn";
+import { IconWorldOff, IconWorldWww } from "@tabler/icons-react";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const itemsStructure: FileTreeItemType[] = [
+    {
+      name: "my-project",
+      children: [
+        {
+          name: "public",
+          children: [
+            {
+              name: "...",
+              type: "file",
+              tooltip: "Static files and assets",
+              isDisabled: true,
+            },
+          ],
+        },
+        {
+          name: "src",
+          children: [
+            {
+              name: "app",
+              isBold: true,
+              children: [
+                {
+                  name: "...",
+                  type: "file",
+                  isDisabled: true,
+                  tooltip: "Pages and layouts go here",
+                },
+              ],
+            },
+            {
+              name: "components",
+              isBold: true,
+              children: [
+                {
+                  name: "...",
+                  type: "file",
+                  isDisabled: true,
+                },
+              ],
+            },
+            {
+              name: "lib",
+              isBold: true,
+              children: [
+                {
+                  name: "...",
+                  type: "file",
+                  isDisabled: true,
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  ];
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+  const itemsPages: FileTreeItemType[] = [
+    {
+      name: "my-project",
+      children: [
+        {
+          name: "src",
+          children: [
+            {
+              name: "app",
+              isBold: true,
+              children: [
+                {
+                  name: "page.tsx",
+                },
+                {
+                  name: "layout.tsx",
+                },
+                {
+                  name: "error.tsx",
+                  tooltip: "Error UI",
+                },
+                {
+                  name: "loading.tsx",
+                  tooltip: "Loading UI",
+                },
+                {
+                  name: "not-found.tsx",
+                  tooltip: "404 UI",
+                },
+                {
+                  name: "api",
+                  children: [
+                    {
+                      name: "route.ts",
+                      tooltip: "API endpoint (without UI)",
+                    },
+                  ],
+                },
+                {
+                  name: "dashboard",
+                  children: [
+                    {
+                      name: "page.tsx",
+                      tooltip: (
+                        <>
+                          <IconWorldWww stroke={1} size={20} />
+                          <span>/dashboard</span>
+                        </>
+                      ),
+                    },
+                    {
+                      name: "layout.tsx",
+                      tooltip: "Nested layout",
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  ];
+
+  const itemsPages2: FileTreeItemType[] = [
+    {
+      name: "my-project",
+      children: [
+        {
+          name: "src",
+          children: [
+            {
+              name: "app",
+              isBold: true,
+              children: [
+                {
+                  name: "page.tsx",
+                },
+                {
+                  name: "layout.tsx",
+                },
+                {
+                  name: "error.tsx",
+                  tooltip: "Error UI",
+                },
+                {
+                  name: "loading.tsx",
+                  tooltip: "Loading UI",
+                },
+                {
+                  name: "not-found.tsx",
+                  tooltip: "404 UI",
+                },
+                {
+                  name: "article",
+                  isSelected: true,
+                  children: [
+                    {
+                      name: "detail.ts",
+                      tooltip: (
+                        <>
+                          <IconWorldOff stroke={1} size={20} />
+                          <span>not routable</span>
+                        </>
+                      ),
+                    },
+                  ],
+                },
+                {
+                  name: "_dashboard",
+                  isSelected: true,
+                  children: [
+                    {
+                      name: "page.tsx",
+                      tooltip: (
+                        <>
+                          <IconWorldOff stroke={1} size={20} />
+                          <span>not routable</span>
+                        </>
+                      ),
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  ];
+
+  const itemsGroups: FileTreeItemType[] = [
+    {
+      name: "my-project",
+      children: [
+        {
+          name: "src",
+          children: [
+            {
+              name: "app",
+              isBold: true,
+              children: [
+                {
+                  name: "(app)",
+                  isSelected: true,
+                  children: [
+                    {
+                      name: "layout.tsx",
+                    },
+                    {
+                      name: "shop",
+                      children: [
+                        {
+                          name: "page.tsx",
+                          tooltip: (
+                            <>
+                              <IconWorldWww stroke={1} size={20} />
+                              <span>/shop</span>
+                            </>
+                          ),
+                        },
+                      ],
+                    },
+                  ],
+                },
+                {
+                  name: "(auth)",
+                  isSelected: true,
+                  children: [
+                    {
+                      name: "layout.tsx",
+                    },
+                    {
+                      name: "profile",
+                      children: [
+                        {
+                          name: "page.tsx",
+                          tooltip: (
+                            <>
+                              <IconWorldWww stroke={1} size={20} />
+                              <span>/profile</span>
+                            </>
+                          ),
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  ];
+
+  const hasTooltip = (items: FileTreeItemType[]): boolean => {
+    return !!items.some(
+      (item) => item.tooltip || (item.children && hasTooltip(item.children))
+    );
+  };
+
+  return (
+    <div className="flex flex-col gap-8 items-center justify-center min-h-screen font-[family-name:var(--font-geist-sans)]">
+      <div className="p-10">
+        <Card
+          className={cn("mx-4", {
+            "mr-[calc(256px+2.5rem)]": hasTooltip(itemsStructure),
+          })}
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+          <FileTree>
+            {itemsStructure.map((item) => (
+              <FileTreeItem key={item.name} item={item} />
+            ))}
+          </FileTree>
+        </Card>
+      </div>
+
+      <div className="p-10">
+        <Card
+          className={cn("mx-4", {
+            "mr-[calc(256px+2.5rem)]": hasTooltip(itemsPages),
+          })}
         >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+          <FileTree>
+            {itemsPages.map((item) => (
+              <FileTreeItem key={item.name} item={item} />
+            ))}
+          </FileTree>
+        </Card>
+      </div>
+
+      <div className="p-10">
+        <Card
+          className={cn("mx-4", {
+            "mr-[calc(256px+2.5rem)]": hasTooltip(itemsPages2),
+          })}
         >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          <FileTree>
+            {itemsPages2.map((item) => (
+              <FileTreeItem key={item.name} item={item} />
+            ))}
+          </FileTree>
+        </Card>
+      </div>
+
+      <div className="p-10">
+        <Card
+          className={cn("mx-4", {
+            "mr-[calc(256px+2.5rem)]": hasTooltip(itemsGroups),
+          })}
+        >
+          <FileTree>
+            {itemsGroups.map((item) => (
+              <FileTreeItem key={item.name} item={item} />
+            ))}
+          </FileTree>
+        </Card>
+      </div>
     </div>
   );
 }
