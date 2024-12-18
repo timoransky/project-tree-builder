@@ -5,38 +5,9 @@ import { FileTreeItem } from "@/components/file-tree-item";
 import type { FileTreeItem as FileTreeItemType } from "@/types/file-tree-item";
 import { cn } from "@/utils/cn";
 import { IconInfoCircle, IconCopy } from "@tabler/icons-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Home() {
-  const [jsonInput, setJsonInput] = useState("");
-  const [parsedItems, setParsedItems] = useState<FileTreeItemType[]>([]);
-  const [error, setError] = useState<string>("");
-
-  const convertToValidJSON = (str: string): string => {
-    // Add quotes to unquoted keys
-    return str.replace(/([{,]\s*)([a-zA-Z0-9_]+)\s*:/g, '$1"$2":');
-  };
-
-  const handleJsonInput = (value: string) => {
-    setJsonInput(value);
-    try {
-      // Preprocess the input before parsing
-      const validJSON = convertToValidJSON(value);
-      const parsed = JSON.parse(validJSON);
-
-      if (Array.isArray(parsed)) {
-        setParsedItems(parsed);
-        setError("");
-      } else {
-        setParsedItems([]);
-        setError("Input must be an array");
-      }
-    } catch (e: unknown) {
-      console.log(e);
-      setError("Invalid JSON format");
-    }
-  };
-
   const jsonExample = `[
   {
     name: "my-project",
@@ -70,6 +41,39 @@ export default function Home() {
   }
 ]`;
 
+  const [jsonInput, setJsonInput] = useState(jsonExample);
+  const [parsedItems, setParsedItems] = useState<FileTreeItemType[]>([]);
+  const [error, setError] = useState<string>("");
+
+  useEffect(() => {
+    handleJsonInput(jsonExample);
+  }, []);
+
+  const convertToValidJSON = (str: string): string => {
+    // Add quotes to unquoted keys
+    return str.replace(/([{,]\s*)([a-zA-Z0-9_]+)\s*:/g, '$1"$2":');
+  };
+
+  const handleJsonInput = (value: string) => {
+    setJsonInput(value);
+    try {
+      // Preprocess the input before parsing
+      const validJSON = convertToValidJSON(value);
+      const parsed = JSON.parse(validJSON);
+
+      if (Array.isArray(parsed)) {
+        setParsedItems(parsed);
+        setError("");
+      } else {
+        setParsedItems([]);
+        setError("Input must be an array");
+      }
+    } catch (e: unknown) {
+      console.log(e);
+      setError("Invalid JSON format");
+    }
+  };
+
   const applyExample = () => {
     handleJsonInput(jsonExample);
   };
@@ -82,7 +86,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col gap-8 items-center justify-center  font-[family-name:var(--font-geist-sans)]">
-      <div className="flex w-full container items-stretch min-h-screen p-4">
+      <div className="flex flex-col lg:flex-row w-full max-w-7xl items-center min-h-screen p-4">
         <Card className="w-1/2 p-4 relative">
           <div className="absolute -right-8 top-0 group">
             <IconInfoCircle
@@ -119,7 +123,7 @@ export default function Home() {
             </div>
           </div>
           <textarea
-            className="w-full h-full relative z-10 p-2 font-mono text-sm border rounded-md dark:bg-gray-800 dark:border-gray-700"
+            className="w-full min-h-60 h-full relative z-10 p-2 font-mono text-sm border rounded-md dark:bg-gray-800 dark:border-gray-700"
             value={jsonInput}
             onChange={(e) => handleJsonInput(e.target.value)}
             placeholder="Paste your file tree JSON here..."
