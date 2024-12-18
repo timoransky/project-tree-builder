@@ -86,7 +86,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col gap-8 items-center justify-center  font-[family-name:var(--font-geist-sans)]">
-      <div className="flex flex-col lg:flex-row w-full max-w-7xl items-center min-h-screen p-4">
+      <div className="flex flex-col lg:flex-row w-full max-w-7xl items-center lg:items-stretch min-h-screen p-4">
         <Card className="w-1/2 p-4 relative">
           <div className="absolute -right-8 top-0 group">
             <IconInfoCircle
