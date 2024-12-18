@@ -1,4 +1,4 @@
-import type { FileTreeItem } from "@/types/file-tree-item";
+import type { FileTreeItem as FileTreeItemType } from "@/types/file-tree-item";
 import { cn } from "@/utils/cn";
 import {
   IconArrowNarrowRight,
@@ -12,7 +12,7 @@ export function FileTreeItem({
   item,
   indent = 0,
 }: {
-  item: FileTreeItem;
+  item: FileTreeItemType;
   indent?: number;
 }) {
   return (

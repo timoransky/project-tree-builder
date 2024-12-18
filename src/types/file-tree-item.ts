@@ -1,4 +1,4 @@
-export type FileType = "file" | "function";
+export type FileType = "file" | "function" | "directory";
 
 export interface FileTreeItem {
   name: string;
@@ -8,4 +8,7 @@ export interface FileTreeItem {
   isBold?: boolean;
   isDisabled?: boolean;
   tooltip?: string | React.ReactNode;
+  onAdd?: () => void;
+  onDelete?: () => void;
+  onEdit?: () => void;
 }
