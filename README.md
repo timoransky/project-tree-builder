@@ -1,36 +1,128 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Project Tree Builder
 
-## Getting Started
+A visual file tree generator that creates customizable, hierarchical representations of project structures. Perfect for documentation, presentations, or visualizing code organization.
 
-First, run the development server:
+## Overview
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+Project Tree Builder allows you to create interactive file tree visualizations with customizable styling options. It supports nested directories, visual highlighting, tooltips, and more to help effectively communicate project structure.
+
+## Features
+
+- Hierarchical file tree visualization
+- Support for nested directories and files
+- Visual customization (bold text, disabled items, selected items)
+- Tooltips for additional context
+- Indent levels for clear hierarchy representation
+
+## Usage
+
+To use Project Tree Builder, simply input your file structure in JSON format. Here's an example:
+
+```json
+[
+  {
+    "name": "src",
+    "icon": "folder",
+    "children": [
+      {
+        "name": "components",
+        "icon": "folder",
+        "children": [
+          {
+            "name": "Button.tsx",
+            "icon": "file"
+          },
+          {
+            "name": "Card.tsx",
+            "icon": "file"
+          }
+        ]
+      },
+      {
+        "name": "app",
+        "isBold": true,
+        "children": [
+          {
+            "name": "api",
+            "children": [
+              {
+                "name": "index.ts",
+                "icon": "function",
+                "tooltip": "API endpoint"
+              },
+              {
+                "name": "fooo.ts",
+                "icon": "function",
+                "isDisabled": true,
+                "tooltip": "Not reachable route"
+              }
+            ]
+          },
+          {
+            "name": "layout.tsx",
+            "icon": "layout",
+            "isSelected": true
+          },
+          {
+            "name": "page.tsx"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "package.json",
+    "icon": "file"
+  }
+]
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The UI will automatically render your file tree with the appropriate styling and hierarchy.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Options
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Each file tree item supports the following properties:
 
-## Learn More
+| Property     | Type                                         | Description                                    |
+| ------------ | -------------------------------------------- | ---------------------------------------------- |
+| `name`       | string                                       | The name of the file or folder                 |
+| `icon`       | "file" \| "function" \| "folder" \| "layout" | The icon to display for the item               |
+| `children`   | FileTreeItem[]                               | Child items for folders                        |
+| `isSelected` | boolean                                      | Displays a blue dot indicator next to the item |
+| `isBold`     | boolean                                      | Renders the item text in bold                  |
+| `isDisabled` | boolean                                      | Grays out the item (20% opacity)               |
+| `tooltip`    | string \| React.ReactNode                    | Additional content displayed on hover          |
+| `onAdd`      | function                                     | Callback function when adding to this item     |
+| `onDelete`   | function                                     | Callback function when deleting this item      |
+| `onEdit`     | function                                     | Callback function when editing this item       |
 
-To learn more about Next.js, take a look at the following resources:
+## Styling
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The component supports automatic indentation up to 7 levels deep:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Level 1: 1rem padding (pl-4)
+- Level 2: 2rem padding (pl-8)
+- Level 3: 3rem padding (pl-12)
+- Level 4: 4rem padding (pl-16)
+- Level 5: 5rem padding (pl-20)
+- Level 6: 6rem padding (pl-24)
+- Level 7: 7rem padding (pl-28)
 
-## Deploy on Vercel
+## Icons
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Folder icon is applied automatically if the item has children but no icon specified
+- Items with no children default to the file icon
+- If the `icon` property is set, it takes precedence over the automatic icon selection
+- Available icons:
+  - `file`: Standard file icon (default)
+  - `function`: Function/method icon
+  - `folder`: Directory/folder icon
+  - `layout`: Layout/interface icon
+- Icons are rendered with increased stroke (1.5) when the item is bold
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Local Development
+
+```bash
+npm install
+npm run dev
+```

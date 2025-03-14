@@ -3,6 +3,7 @@ import plugin from "tailwindcss/plugin";
 import maskPlugin from "@lostisworld/tailwind-mask";
 
 export default {
+  darkMode: "class",
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",

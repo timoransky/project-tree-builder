@@ -1,8 +1,8 @@
-export type FileType = "file" | "function" | "directory";
+export type FileIconType = "file" | "function" | "folder" | "layout";
 
 export interface FileTreeItem {
   name: string;
-  type?: FileType;
+  icon?: FileIconType;
   children?: FileTreeItem[];
   isSelected?: boolean;
   isBold?: boolean;
