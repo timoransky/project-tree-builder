@@ -14,7 +14,6 @@ import {
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
-import html2canvas from "html2canvas";
 import domtoimage from "dom-to-image";
 
 const jsonExample = `[
@@ -156,27 +155,6 @@ export default function Home() {
       link.click();
     } catch (err) {
       console.error("Failed to export image:", err);
-
-      // Fallback to html2canvas if dom-to-image fails
-      try {
-        alert(
-          "Using fallback export method. This might not render fonts correctly."
-        );
-        const canvas = await html2canvas(fileTreeRef.current, {
-          backgroundColor:
-            getComputedStyle(fileTreeRef.current).backgroundColor || "#ffffff",
-          scale: 2,
-        });
-
-        const image = canvas.toDataURL("image/png", 1.0);
-        const link = document.createElement("a");
-        link.download = "project-tree.png";
-        link.href = image;
-        link.click();
-      } catch (fallbackErr) {
-        console.error("Fallback also failed:", fallbackErr);
-        alert("Failed to export image. Please try a different browser.");
-      }
     }
   };
 
@@ -309,23 +287,24 @@ export default function Home() {
                     </span>
                   </button>
                 </div>
-                <div
-                  className="p-10 bg-white border border-gray-100/10 dark:bg-gray-900 w-full"
-                  ref={fileTreeRef}
-                  id="file-tree-container"
-                >
-                  <Card
-                    className={cn({
-                      "md:w-[calc(50%-1rem)] max-md:w-full":
-                        hasTooltip(parsedItems),
-                    })}
+                <div className="border border-gray-100/10">
+                  <div
+                    className="p-10 bg-white dark:bg-gray-900 w-full"
+                    ref={fileTreeRef}
                   >
-                    <FileTree>
-                      {parsedItems.map((item, index) => (
-                        <FileTreeItem key={index} item={item} />
-                      ))}
-                    </FileTree>
-                  </Card>
+                    <Card
+                      className={cn({
+                        "md:w-[calc(50%-1rem)] max-md:w-full":
+                          hasTooltip(parsedItems),
+                      })}
+                    >
+                      <FileTree>
+                        {parsedItems.map((item, index) => (
+                          <FileTreeItem key={index} item={item} />
+                        ))}
+                      </FileTree>
+                    </Card>
+                  </div>
                 </div>
               </div>
             </div>

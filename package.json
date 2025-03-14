@@ -14,8 +14,7 @@
     "@tabler/icons-react": "^3.24.0",
     "clsx": "^2.1.1",
     "dom-to-image": "^2.6.0",
-    "html2canvas": "^1.4.1",
-    "next": "15.0.4",
+    "next": "^15.2.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tailwind-merge": "^2.5.5"
