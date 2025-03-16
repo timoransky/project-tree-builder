@@ -190,7 +190,7 @@ export default function Home() {
             clipPath:
               "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
           }}
-          className="relative left-1/2 aspect-[1155/678] w-[36.125rem] -translate-x-1/2 bg-gradient-to-tr from-teal-500 to-pink-500 opacity-30 sm:w-[72.1875rem]"
+          className="relative left-1/2 aspect-[1155/678] w-[36.125rem] -translate-x-1/2 bg-gradient-to-tr from-teal-400 via-amber-500 to-pink-500 opacity-30 sm:w-[72.1875rem]"
         />
       </div>
 
@@ -208,69 +208,88 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row w-full max-w-7xl items-stretch min-h-screen p-4 gap-8">
-          <Card className="lg:w-1/2 relative p-0">
-            <div className="absolute -right-8 top-0 group">
-              <IconInfoCircle
-                className="text-gray-400 hover:text-gray-600 cursor-help"
-                size={20}
-              />
-              <div className="hidden group-hover:block absolute left-0 pl-8 top-0 z-20 w-96">
-                <Card className="p-4 text-sm">
-                  <div className="flex justify-between items-start mb-2">
-                    <h4 className="font-bold">JSON Configuration</h4>
-                    <button
-                      onClick={applyExample}
-                      className="flex items-center gap-1 px-2 py-1 text-xs text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800 rounded-md"
-                    >
-                      <IconCopy size={14} />
-                      Apply example
-                    </button>
-                  </div>
-                  <p className="mb-2 text-gray-600 dark:text-gray-400">
-                    Customize your tree with these properties:
-                  </p>
-                  <ul className="list-disc pl-4 mb-4 text-gray-600 dark:text-gray-400">
-                    <li>
-                      <strong>name:</strong> string (required)
-                    </li>
-                    <li>
-                      <strong>icon:</strong> string (optional, one of `folder`,
-                      `file`, `function`, `layout`)
-                    </li>
-                    <li>
-                      <strong>children:</strong> array of nested items
-                    </li>
-                    <li>
-                      <strong>isBold:</strong> boolean - makes text bold
-                    </li>
-                    <li>
-                      <strong>isSelected:</strong> boolean - highlights the item
-                    </li>
-                    <li>
-                      <strong>isDisabled:</strong> boolean - grays out the item
-                    </li>
-                    <li>
-                      <strong>tooltip:</strong> string - adds a tooltip message
-                    </li>
-                  </ul>
-                  <pre className="bg-gray-100 dark:bg-gray-800 p-2 rounded-md text-xs overflow-auto">
-                    {jsonExample}
-                  </pre>
-                </Card>
+        <div className="flex flex-col lg:flex-row w-full max-w-7xl items-start p-4 gap-8">
+          <div className="lg:w-1/2 min-h-screen flex flex-col">
+            <div className="flex items-end justify-between pb-2">
+              <p className="text-gray-600 dark:text-gray-400">
+                JSON structure:
+              </p>
+              <div className="group relative">
+                <button
+                  onClick={exportAsImage}
+                  className="p-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 transition-colors flex items-center cursor-help"
+                  title="Export as PNG image"
+                >
+                  <IconInfoCircle className="h-5 w-5" />
+                </button>
+                <div className="hidden group-hover:block absolute left-full pl-4 top-0 z-20 w-96">
+                  <Card className="p-4 text-sm">
+                    <div className="flex justify-between items-start mb-2">
+                      <h4 className="font-bold">JSON Configuration</h4>
+                      <button
+                        onClick={applyExample}
+                        className="flex items-center gap-1 px-2 py-1 text-xs text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800 rounded-md"
+                      >
+                        <IconCopy size={14} />
+                        Apply example
+                      </button>
+                    </div>
+                    <p className="mb-2 text-gray-600 dark:text-gray-400">
+                      Customize your tree with these properties:
+                    </p>
+                    <ul className="list-disc pl-4 mb-4 text-gray-600 dark:text-gray-400">
+                      <li>
+                        <strong>name:</strong> string (required)
+                      </li>
+                      <li>
+                        <strong>icon:</strong> string (optional, one of
+                        `folder`, `file`, `function`, `layout`)
+                      </li>
+                      <li>
+                        <strong>children:</strong> array of nested items
+                      </li>
+                      <li>
+                        <strong>isBold:</strong> boolean - makes text bold
+                      </li>
+                      <li>
+                        <strong>isSelected:</strong> boolean - highlights the
+                        item
+                      </li>
+                      <li>
+                        <strong>isDisabled:</strong> boolean - grays out the
+                        item
+                      </li>
+                      <li>
+                        <strong>tooltip:</strong> string - adds a tooltip
+                        message
+                      </li>
+                    </ul>
+                    <pre className="bg-gray-100 dark:bg-gray-800 p-2 rounded-md text-xs overflow-auto">
+                      {jsonExample}
+                    </pre>
+                  </Card>
+                </div>
               </div>
             </div>
-            <textarea
-              className="w-full min-h-60 h-full relative z-10 p-4 font-mono text-sm rounded-md dark:bg-gray-800"
-              value={jsonInput}
-              onChange={(e) => handleJsonInput(e.target.value)}
-              placeholder="Enter your project structure as JSON (or use the example)..."
-            />
+
+            <Card className="relative p-0 h-full">
+              <textarea
+                className={cn(
+                  "resize-none focus:border-none focus:ring-1 ring-teal-300 focus:outline-none block w-full min-h-[calc(100vh-8rem)] h-full relative z-10 p-4 font-mono text-sm rounded-md dark:bg-gray-800",
+                  {
+                    "ring-red-500": error,
+                  }
+                )}
+                value={jsonInput}
+                onChange={(e) => handleJsonInput(e.target.value)}
+                placeholder="Enter your project structure as JSON (or use the example)..."
+              />
+            </Card>
             {error && <div className="text-red-500 mt-2 p-2">{error}</div>}
-          </Card>
+          </div>
 
           {parsedItems.length > 0 && (
-            <div className="lg:w-1/2 flex items-center justify-center">
+            <div className="lg:w-1/2 flex sticky top-4 items-center justify-center">
               <div className="relative w-full">
                 <div className="flex items-end justify-between pb-2">
                   <p className="text-gray-600 dark:text-gray-400">
@@ -278,16 +297,14 @@ export default function Home() {
                   </p>
                   <button
                     onClick={exportAsImage}
-                    className="p-2 bg-white dark:bg-gray-800 rounded-md shadow-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center gap-1"
+                    className="p-2 rounded-md shadow-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800 transition-colors flex items-center gap-1"
                     title="Export as PNG image"
                   >
-                    <IconDownload className="h-4 w-4 text-gray-600 dark:text-gray-300" />
-                    <span className="text-sm text-gray-600 dark:text-gray-300">
-                      Export as image
-                    </span>
+                    <IconDownload className="h-4 w-4" />
+                    <span className="text-sm">Export as image</span>
                   </button>
                 </div>
-                <div className="border border-gray-100/10">
+                <div className="border border-gray-100 dark:border-gray-100/10">
                   <div
                     className="p-10 bg-white dark:bg-gray-900 w-full"
                     ref={fileTreeRef}
