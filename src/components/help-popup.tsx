@@ -6,17 +6,73 @@ interface HelpPopupProps {
   activeTab: InputTabType;
   jsonExample: string;
   htmlExample: string;
+  markdownExample: string;
   applyJsonExample: () => void;
   applyHtmlExample: () => void;
+  applyMarkdownExample: () => void;
 }
 
 export function HelpPopup({
   activeTab,
   jsonExample,
   htmlExample,
+  markdownExample,
   applyJsonExample,
   applyHtmlExample,
+  applyMarkdownExample,
 }: HelpPopupProps) {
+  const getExampleHandler = () => {
+    switch (activeTab) {
+      case "json":
+        return applyJsonExample;
+      case "html":
+        return applyHtmlExample;
+      case "markdown":
+        return applyMarkdownExample;
+      default:
+        return () => {};
+    }
+  };
+
+  const getConfigTitle = () => {
+    switch (activeTab) {
+      case "json":
+        return "JSON Configuration";
+      case "html":
+        return "HTML List Configuration";
+      case "markdown":
+        return "Markdown List Configuration";
+      default:
+        return "";
+    }
+  };
+
+  const getDescription = () => {
+    switch (activeTab) {
+      case "json":
+        return "Customize your tree with these properties:";
+      case "html":
+        return "Use HTML lists to define your tree structure:";
+      case "markdown":
+        return "Use Markdown lists to define your tree structure:";
+      default:
+        return "";
+    }
+  };
+
+  const getExample = () => {
+    switch (activeTab) {
+      case "json":
+        return jsonExample;
+      case "html":
+        return htmlExample;
+      case "markdown":
+        return markdownExample;
+      default:
+        return "";
+    }
+  };
+
   return (
     <div className="group relative">
       <button
@@ -28,15 +84,9 @@ export function HelpPopup({
       <div className="hidden group-hover:block absolute left-full pl-4 top-0 z-20 w-96">
         <Card className="p-4 text-sm">
           <div className="flex justify-between items-start mb-2">
-            <h4 className="font-bold">
-              {activeTab === "json"
-                ? "JSON Configuration"
-                : "HTML List Configuration"}
-            </h4>
+            <h4 className="font-bold">{getConfigTitle()}</h4>
             <button
-              onClick={
-                activeTab === "json" ? applyJsonExample : applyHtmlExample
-              }
+              onClick={getExampleHandler()}
               className="flex items-center gap-1 px-2 py-1 text-xs text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800 rounded-md"
             >
               <IconCopy size={14} />
@@ -44,9 +94,7 @@ export function HelpPopup({
             </button>
           </div>
           <p className="mb-2 text-gray-600 dark:text-gray-400">
-            {activeTab === "json"
-              ? "Customize your tree with these properties:"
-              : "Use HTML lists to define your tree structure:"}
+            {getDescription()}
           </p>
           {activeTab === "json" ? (
             <>
@@ -78,7 +126,7 @@ export function HelpPopup({
                 {jsonExample}
               </pre>
             </>
-          ) : (
+          ) : activeTab === "html" ? (
             <>
               <ul className="list-disc pl-4 mb-4 text-gray-600 dark:text-gray-400">
                 <li>
@@ -103,6 +151,34 @@ export function HelpPopup({
               </ul>
               <pre className="bg-gray-100 dark:bg-gray-800 p-2 rounded-md text-xs overflow-auto">
                 {htmlExample}
+              </pre>
+            </>
+          ) : (
+            <>
+              <ul className="list-disc pl-4 mb-4 text-gray-600 dark:text-gray-400">
+                <li>
+                  <strong>* or - or +</strong>: Create list items
+                </li>
+                <li>
+                  <strong>Indentation:</strong> Creates nested hierarchy
+                </li>
+                <li>
+                  <strong>**bold text**</strong>: Makes text bold
+                </li>
+                <li>
+                  <strong>[selected]</strong>: Highlights the item (append to
+                  line)
+                </li>
+                <li>
+                  <strong>[disabled]</strong>: Grays out the item (append to
+                  line)
+                </li>
+                <li>
+                  <strong>(tooltip text)</strong>: Adds tooltip (append to line)
+                </li>
+              </ul>
+              <pre className="bg-gray-100 dark:bg-gray-800 p-2 rounded-md text-xs overflow-auto">
+                {markdownExample}
               </pre>
             </>
           )}

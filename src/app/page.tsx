@@ -11,13 +11,19 @@ import { TreePreview } from "@/components/tree-preview";
 import { HelpPopup } from "@/components/help-popup";
 import { ThemeSwitch } from "@/components/theme-switch";
 import { Footer } from "@/components/footer";
-import { jsonExample, htmlExample } from "@/components/constants";
+import {
+  jsonExample,
+  htmlExample,
+  markdownExample,
+} from "@/components/constants";
+import { parseMarkdownToFileTree } from "@/utils/markdown-parser";
 
 export default function Home() {
   const [darkMode, setDarkMode] = useState(false);
   const [activeTab, setActiveTab] = useState<InputTabType>("json");
   const [jsonInput, setJsonInput] = useState(jsonExample);
   const [htmlInput, setHtmlInput] = useState(htmlExample);
+  const [markdownInput, setMarkdownInput] = useState(markdownExample);
   const [parsedItems, setParsedItems] = useState<FileTreeItemType[]>([]);
   const [error, setError] = useState<string>("");
 
@@ -103,6 +109,26 @@ export default function Home() {
     }
   };
 
+  const handleMarkdownInput = (value: string) => {
+    setMarkdownInput(value);
+    try {
+      const parsed = parseMarkdownToFileTree(value);
+
+      if (parsed.length > 0) {
+        setParsedItems(parsed);
+        setError("");
+      } else {
+        setParsedItems([]);
+        setError(
+          "Could not parse Markdown. Make sure to use * or - or + for list items."
+        );
+      }
+    } catch (e: unknown) {
+      console.log(e);
+      setError("Invalid Markdown format");
+    }
+  };
+
   const parseHtmlListToFileTree = (ul: HTMLElement): FileTreeItemType[] => {
     const items: FileTreeItemType[] = [];
 
@@ -149,6 +175,11 @@ export default function Home() {
   const applyHtmlExample = () => {
     setActiveTab("html");
     handleHtmlInput(htmlExample);
+  };
+
+  const applyMarkdownExample = () => {
+    setActiveTab("markdown");
+    handleMarkdownInput(markdownExample);
   };
 
   return (
@@ -203,8 +234,10 @@ export default function Home() {
                 activeTab={activeTab}
                 jsonExample={jsonExample}
                 htmlExample={htmlExample}
+                markdownExample={markdownExample}
                 applyJsonExample={applyJsonExample}
                 applyHtmlExample={applyHtmlExample}
+                applyMarkdownExample={applyMarkdownExample}
               />
             </div>
 
@@ -212,9 +245,11 @@ export default function Home() {
               activeTab={activeTab}
               jsonInput={jsonInput}
               htmlInput={htmlInput}
+              markdownInput={markdownInput}
               error={error}
               onJsonChange={handleJsonInput}
               onHtmlChange={handleHtmlInput}
+              onMarkdownChange={handleMarkdownInput}
             />
           </div>
 

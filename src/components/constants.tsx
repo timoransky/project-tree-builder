@@ -51,3 +51,10 @@ export const htmlExample = `<ul>
     </ul>
   </li>
 </ul>`;
+
+export const markdownExample = `* my-project
+  * **src**
+    * app [selected]
+      * page.tsx (Main page component)
+    * components
+      * ... [disabled]`;

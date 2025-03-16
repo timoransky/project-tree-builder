@@ -1,6 +1,6 @@
 import { cn } from "@/utils/cn";
 
-export type InputTabType = "json" | "html";
+export type InputTabType = "json" | "html" | "markdown";
 
 interface InputTabsProps {
   activeTab: InputTabType;
@@ -30,7 +30,18 @@ export function InputTabs({ activeTab, setActiveTab }: InputTabsProps) {
             : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
         )}
       >
-        HTML List
+        HTML
+      </button>
+      <button
+        onClick={() => setActiveTab("markdown")}
+        className={cn(
+          "px-4 py-2 rounded-t-md transition-colors",
+          activeTab === "markdown"
+            ? "bg-white dark:bg-gray-800 text-teal-500 dark:text-teal-400 border-b-2 border-teal-500 dark:border-teal-400"
+            : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+        )}
+      >
+        Markdown
       </button>
     </div>
   );

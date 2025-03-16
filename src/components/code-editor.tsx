@@ -6,26 +6,59 @@ interface CodeEditorProps {
   activeTab: InputTabType;
   jsonInput: string;
   htmlInput: string;
+  markdownInput: string;
   error: string;
   onJsonChange: (value: string) => void;
   onHtmlChange: (value: string) => void;
+  onMarkdownChange: (value: string) => void;
 }
 
 export function CodeEditor({
   activeTab,
   jsonInput,
   htmlInput,
+  markdownInput,
   error,
   onJsonChange,
   onHtmlChange,
+  onMarkdownChange,
 }: CodeEditorProps) {
   const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     if (activeTab === "json") {
       onJsonChange(e.target.value);
     } else if (activeTab === "html") {
       onHtmlChange(e.target.value);
+    } else if (activeTab === "markdown") {
+      onMarkdownChange(e.target.value);
     }
   };
+
+  const getInputValue = () => {
+    switch (activeTab) {
+      case "json":
+        return jsonInput;
+      case "html":
+        return htmlInput;
+      case "markdown":
+        return markdownInput;
+      default:
+        return "";
+    }
+  };
+
+  const getPlaceholder = () => {
+    switch (activeTab) {
+      case "json":
+        return "Enter your project structure as JSON (or use the example)...";
+      case "html":
+        return "Enter your project structure as HTML list (or use the example)...";
+      case "markdown":
+        return "Enter your project structure as Markdown list (or use the example)...";
+      default:
+        return "";
+    }
+  };
+
   return (
     <>
       <Card className="relative p-0 h-full">
@@ -36,13 +69,9 @@ export function CodeEditor({
               "ring-red-500": error,
             }
           )}
-          value={activeTab === "json" ? jsonInput : htmlInput}
+          value={getInputValue()}
           onChange={onChange}
-          placeholder={
-            activeTab === "json"
-              ? "Enter your project structure as JSON (or use the example)..."
-              : "Enter your project structure as HTML list (or use the example)..."
-          }
+          placeholder={getPlaceholder()}
         />
       </Card>
       {error && <div className="text-red-500 mt-2 p-2">{error}</div>}
