@@ -1,56 +1,25 @@
 "use client";
-import { Card } from "@/components/card";
-import { FileTree } from "@/components/file-tree";
-import { FileTreeItem } from "@/components/file-tree-item";
-import type { FileTreeItem as FileTreeItemType } from "@/types/file-tree-item";
-import { cn } from "@/utils/cn";
-import {
-  IconInfoCircle,
-  IconCopy,
-  IconBrandGithub,
-  IconDownload,
-  IconSun,
-  IconMoon,
-} from "@tabler/icons-react";
-import Link from "next/link";
-import { useState, useEffect, useRef } from "react";
-import domtoimage from "dom-to-image";
 
-const jsonExample = `[
-  {
-    name: "my-project",
-    children: [
-      {
-        name: "src",
-        isBold: true,
-        children: [
-          {
-            name: "app",
-            isSelected: true,
-            children: [
-              {
-                name: "page.tsx",
-                tooltip: "Main page component"
-              }
-            ]
-          },
-          {
-            name: "components",
-            children: [
-              {
-                name: "...",
-                isDisabled: true
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
-]`;
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { IconBrandGithub } from "@tabler/icons-react";
+
+import type { FileTreeItem as FileTreeItemType } from "@/types/file-tree-item";
+import { InputTabs, InputTabType } from "@/components/input-tabs";
+import { CodeEditor } from "@/components/code-editor";
+import { TreePreview } from "@/components/tree-preview";
+import { HelpPopup } from "@/components/help-popup";
+import { ThemeSwitch } from "@/components/theme-switch";
+import { Footer } from "@/components/footer";
+import { jsonExample, htmlExample } from "@/components/constants";
 
 export default function Home() {
   const [darkMode, setDarkMode] = useState(false);
+  const [activeTab, setActiveTab] = useState<InputTabType>("json");
+  const [jsonInput, setJsonInput] = useState(jsonExample);
+  const [htmlInput, setHtmlInput] = useState(htmlExample);
+  const [parsedItems, setParsedItems] = useState<FileTreeItemType[]>([]);
+  const [error, setError] = useState<string>("");
 
   // Initialize dark mode based on system preference or saved preference
   useEffect(() => {
@@ -74,6 +43,10 @@ export default function Home() {
     }
   }, []);
 
+  useEffect(() => {
+    handleJsonInput(jsonExample);
+  }, []);
+
   const toggleDarkMode = () => {
     const newDarkMode = !darkMode;
     setDarkMode(newDarkMode);
@@ -81,15 +54,6 @@ export default function Home() {
     // Save preference to localStorage
     localStorage.setItem("theme", newDarkMode ? "dark" : "light");
   };
-
-  const [jsonInput, setJsonInput] = useState(jsonExample);
-  const [parsedItems, setParsedItems] = useState<FileTreeItemType[]>([]);
-  const [error, setError] = useState<string>("");
-  const fileTreeRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    handleJsonInput(jsonExample);
-  }, []);
 
   const convertToValidJSON = (str: string): string => {
     // Add quotes to unquoted keys
@@ -102,8 +66,6 @@ export default function Home() {
       // Preprocess the input before parsing
       const validJSON = convertToValidJSON(value);
       const parsed = JSON.parse(validJSON);
-
-      console.log(parsed);
 
       if (Array.isArray(parsed)) {
         setParsedItems(parsed);
@@ -118,60 +80,81 @@ export default function Home() {
     }
   };
 
-  const applyExample = () => {
+  const handleHtmlInput = (value: string) => {
+    setHtmlInput(value);
+    try {
+      // Parse HTML to FileTreeItemType structure
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(value, "text/html");
+      const rootList = doc.querySelector("ul");
+
+      if (!rootList) {
+        setError("Invalid HTML format. Need a <ul> element");
+        setParsedItems([]);
+        return;
+      }
+
+      const parsed = parseHtmlListToFileTree(rootList);
+      setParsedItems(parsed);
+      setError("");
+    } catch (e: unknown) {
+      console.log(e);
+      setError("Invalid HTML format");
+    }
+  };
+
+  const parseHtmlListToFileTree = (ul: HTMLElement): FileTreeItemType[] => {
+    const items: FileTreeItemType[] = [];
+
+    ul.querySelectorAll(":scope > li").forEach((li) => {
+      const item: FileTreeItemType = {
+        name: li.childNodes[0].textContent?.trim() || "",
+      };
+
+      // Check for classes and attributes
+      if (li.classList.contains("selected")) {
+        item.isSelected = true;
+      }
+      if (li.classList.contains("disabled")) {
+        item.isDisabled = true;
+      }
+      if (li.hasAttribute("title")) {
+        item.tooltip = li.getAttribute("title") || undefined;
+      }
+
+      // Check for bold text
+      const strongElement = li.querySelector(":scope > strong");
+      if (strongElement) {
+        item.isBold = true;
+        item.name = strongElement.textContent?.trim() || "";
+      }
+
+      // Check for nested lists
+      const nestedUl = li.querySelector(":scope > ul");
+      if (nestedUl) {
+        item.children = parseHtmlListToFileTree(nestedUl as HTMLElement);
+      }
+
+      items.push(item);
+    });
+
+    return items;
+  };
+
+  const applyJsonExample = () => {
+    setActiveTab("json");
     handleJsonInput(jsonExample);
   };
 
-  const hasTooltip = (items: FileTreeItemType[]): boolean => {
-    return !!items.some(
-      (item) => item.tooltip || (item.children && hasTooltip(item.children))
-    );
-  };
-
-  const exportAsImage = async () => {
-    if (!fileTreeRef.current) return;
-
-    try {
-      // Wait for fonts to load
-      await document.fonts.ready;
-
-      const node = fileTreeRef.current;
-
-      // Use dom-to-image which handles fonts better
-      const dataUrl = await domtoimage.toPng(node, {
-        quality: 1.0,
-        style: {
-          transform: "scale(3)",
-          "transform-origin": "top left",
-        },
-        width: node.offsetWidth * 3,
-        height: node.offsetHeight * 3,
-      });
-
-      // Download the image
-      const link = document.createElement("a");
-      link.download = "project-tree.png";
-      link.href = dataUrl;
-      link.click();
-    } catch (err) {
-      console.error("Failed to export image:", err);
-    }
+  const applyHtmlExample = () => {
+    setActiveTab("html");
+    handleHtmlInput(htmlExample);
   };
 
   return (
     <div className="relative isolate pt-14">
       <div className="absolute top-6 right-6 flex gap-6 items-center">
-        <button
-          onClick={toggleDarkMode}
-          className="text-gray-900 dark:text-gray-200 hover:text-teal-500 dark:hover:text-teal-400 transition-colors"
-          title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
-        >
-          {darkMode ? (
-            <IconSun className="h-7 w-7" />
-          ) : (
-            <IconMoon className="h-7 w-7" />
-          )}
-        </button>
+        <ThemeSwitch darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
         <Link
           href="https://github.com/timoransky/project-tree-builder"
           target="_blank"
@@ -181,6 +164,7 @@ export default function Home() {
         </Link>
       </div>
 
+      {/* Background decoration */}
       <div
         aria-hidden="true"
         className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"
@@ -195,6 +179,7 @@ export default function Home() {
       </div>
 
       <div className="flex flex-col gap-8 items-center justify-center font-[family-name:var(--font-geist-sans)]">
+        {/* Header */}
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center py-20 lg:pt-32 lg:pb-24">
             <h1 className="text-5xl font-semibold tracking-tight text-balance text-gray-900 dark:text-gray-200 sm:text-7xl">
@@ -208,139 +193,37 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Main content area */}
         <div className="flex flex-col lg:flex-row w-full max-w-7xl items-start p-4 gap-8">
+          {/* Left panel - Code editor */}
           <div className="lg:w-1/2 min-h-screen flex flex-col">
             <div className="flex items-end justify-between pb-2">
-              <p className="text-gray-600 dark:text-gray-400">
-                JSON structure:
-              </p>
-              <div className="group relative">
-                <button
-                  onClick={exportAsImage}
-                  className="p-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 transition-colors flex items-center cursor-help"
-                  title="Export as PNG image"
-                >
-                  <IconInfoCircle className="h-5 w-5" />
-                </button>
-                <div className="hidden group-hover:block absolute left-full pl-4 top-0 z-20 w-96">
-                  <Card className="p-4 text-sm">
-                    <div className="flex justify-between items-start mb-2">
-                      <h4 className="font-bold">JSON Configuration</h4>
-                      <button
-                        onClick={applyExample}
-                        className="flex items-center gap-1 px-2 py-1 text-xs text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800 rounded-md"
-                      >
-                        <IconCopy size={14} />
-                        Apply example
-                      </button>
-                    </div>
-                    <p className="mb-2 text-gray-600 dark:text-gray-400">
-                      Customize your tree with these properties:
-                    </p>
-                    <ul className="list-disc pl-4 mb-4 text-gray-600 dark:text-gray-400">
-                      <li>
-                        <strong>name:</strong> string (required)
-                      </li>
-                      <li>
-                        <strong>icon:</strong> string (optional, one of
-                        `folder`, `file`, `function`, `layout`)
-                      </li>
-                      <li>
-                        <strong>children:</strong> array of nested items
-                      </li>
-                      <li>
-                        <strong>isBold:</strong> boolean - makes text bold
-                      </li>
-                      <li>
-                        <strong>isSelected:</strong> boolean - highlights the
-                        item
-                      </li>
-                      <li>
-                        <strong>isDisabled:</strong> boolean - grays out the
-                        item
-                      </li>
-                      <li>
-                        <strong>tooltip:</strong> string - adds a tooltip
-                        message
-                      </li>
-                    </ul>
-                    <pre className="bg-gray-100 dark:bg-gray-800 p-2 rounded-md text-xs overflow-auto">
-                      {jsonExample}
-                    </pre>
-                  </Card>
-                </div>
-              </div>
+              <InputTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+              <HelpPopup
+                activeTab={activeTab}
+                jsonExample={jsonExample}
+                htmlExample={htmlExample}
+                applyJsonExample={applyJsonExample}
+                applyHtmlExample={applyHtmlExample}
+              />
             </div>
 
-            <Card className="relative p-0 h-full">
-              <textarea
-                className={cn(
-                  "resize-none focus:border-none focus:ring-1 ring-teal-300 focus:outline-none block w-full min-h-[calc(100vh-8rem)] h-full relative z-10 p-4 font-mono text-sm rounded-md dark:bg-gray-800",
-                  {
-                    "ring-red-500": error,
-                  }
-                )}
-                value={jsonInput}
-                onChange={(e) => handleJsonInput(e.target.value)}
-                placeholder="Enter your project structure as JSON (or use the example)..."
-              />
-            </Card>
-            {error && <div className="text-red-500 mt-2 p-2">{error}</div>}
+            <CodeEditor
+              activeTab={activeTab}
+              jsonInput={jsonInput}
+              htmlInput={htmlInput}
+              error={error}
+              onJsonChange={handleJsonInput}
+              onHtmlChange={handleHtmlInput}
+            />
           </div>
 
-          {parsedItems.length > 0 && (
-            <div className="lg:w-1/2 flex sticky top-4 items-center justify-center">
-              <div className="relative w-full">
-                <div className="flex items-end justify-between pb-2">
-                  <p className="text-gray-600 dark:text-gray-400">
-                    Tree preview:
-                  </p>
-                  <button
-                    onClick={exportAsImage}
-                    className="p-2 rounded-md shadow-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800 transition-colors flex items-center gap-1"
-                    title="Export as PNG image"
-                  >
-                    <IconDownload className="h-4 w-4" />
-                    <span className="text-sm">Export as image</span>
-                  </button>
-                </div>
-                <div className="border border-gray-100 dark:border-gray-100/10">
-                  <div
-                    className="p-10 bg-white dark:bg-gray-900 w-full"
-                    ref={fileTreeRef}
-                  >
-                    <Card
-                      className={cn({
-                        "md:w-[calc(50%-1rem)] max-md:w-full":
-                          hasTooltip(parsedItems),
-                      })}
-                    >
-                      <FileTree>
-                        {parsedItems.map((item, index) => (
-                          <FileTreeItem key={index} item={item} />
-                        ))}
-                      </FileTree>
-                    </Card>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
+          {/* Right panel - Tree preview */}
+          {parsedItems.length > 0 && <TreePreview parsedItems={parsedItems} />}
         </div>
 
-        {/* Footer with attribution */}
-        <div className="w-full py-8 text-center text-sm text-gray-500 dark:text-gray-400">
-          <p>
-            Crafted with ❤️‍🔥 by{" "}
-            <Link
-              href="https://janci.dev"
-              target="_blank"
-              className="font-medium text-teal-600 hover:text-teal-500 dark:text-teal-400 dark:hover:text-teal-300 transition-colors"
-            >
-              janci.dev
-            </Link>
-          </p>
-        </div>
+        {/* Footer */}
+        <Footer />
       </div>
     </div>
   );
