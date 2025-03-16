@@ -60,26 +60,13 @@ export function HelpPopup({
     }
   };
 
-  const getExample = () => {
-    switch (activeTab) {
-      case "json":
-        return jsonExample;
-      case "html":
-        return htmlExample;
-      case "markdown":
-        return markdownExample;
-      default:
-        return "";
-    }
-  };
-
   return (
     <div className="group relative">
       <button
         className="p-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 transition-colors flex items-center cursor-help"
         title="Documentation"
       >
-        <IconInfoCircle className="h-5 w-5" />
+        <IconInfoCircle className="h-5 w-5 pb-1" />
       </button>
       <div className="hidden group-hover:block absolute left-full pl-4 top-0 z-20 w-96">
         <Card className="p-4 text-sm">

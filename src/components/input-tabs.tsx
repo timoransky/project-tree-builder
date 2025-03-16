@@ -9,14 +9,14 @@ interface InputTabsProps {
 
 export function InputTabs({ activeTab, setActiveTab }: InputTabsProps) {
   return (
-    <div className="flex space-x-2">
+    <div className="flex space-x-2 pl-4">
       <button
         onClick={() => setActiveTab("json")}
         className={cn(
-          "px-4 py-2 rounded-t-md transition-colors",
+          "px-4 py-2 rounded-t-md transition-colors border-b-2",
           activeTab === "json"
-            ? "bg-white dark:bg-gray-800 text-teal-500 dark:text-teal-400 border-b-2 border-teal-500 dark:border-teal-400"
-            : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+            ? "bg-white dark:bg-gray-800 text-teal-500 dark:text-teal-400 border-teal-500 dark:border-teal-400"
+            : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-transparent hover:bg-gray-200 dark:hover:bg-gray-600"
         )}
       >
         JSON
@@ -24,10 +24,10 @@ export function InputTabs({ activeTab, setActiveTab }: InputTabsProps) {
       <button
         onClick={() => setActiveTab("html")}
         className={cn(
-          "px-4 py-2 rounded-t-md transition-colors",
+          "px-4 py-2 rounded-t-md transition-colors border-b-2",
           activeTab === "html"
-            ? "bg-white dark:bg-gray-800 text-teal-500 dark:text-teal-400 border-b-2 border-teal-500 dark:border-teal-400"
-            : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+            ? "bg-white dark:bg-gray-800 text-teal-500 dark:text-teal-400 border-teal-500 dark:border-teal-400"
+            : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-transparent hover:bg-gray-200 dark:hover:bg-gray-600"
         )}
       >
         HTML
@@ -35,10 +35,10 @@ export function InputTabs({ activeTab, setActiveTab }: InputTabsProps) {
       <button
         onClick={() => setActiveTab("markdown")}
         className={cn(
-          "px-4 py-2 rounded-t-md transition-colors",
+          "px-4 py-2 rounded-t-md transition-colors border-b-2",
           activeTab === "markdown"
-            ? "bg-white dark:bg-gray-800 text-teal-500 dark:text-teal-400 border-b-2 border-teal-500 dark:border-teal-400"
-            : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+            ? "bg-white dark:bg-gray-800 text-teal-500 dark:text-teal-400 border-teal-500 dark:border-teal-400"
+            : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-transparent hover:bg-gray-200 dark:hover:bg-gray-600"
         )}
       >
         Markdown

@@ -227,8 +227,8 @@ export default function Home() {
         {/* Main content area */}
         <div className="flex flex-col lg:flex-row w-full max-w-7xl items-start p-4 gap-8">
           {/* Left panel - Code editor */}
-          <div className="lg:w-1/2 min-h-screen flex flex-col">
-            <div className="flex items-end justify-between pb-2">
+          <div className="lg:w-1/2 min-h-screen flex flex-col pt-0.5">
+            <div className="flex items-end justify-between">
               <InputTabs activeTab={activeTab} setActiveTab={setActiveTab} />
               <HelpPopup
                 activeTab={activeTab}
