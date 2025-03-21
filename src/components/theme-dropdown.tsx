@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { IconPalette } from "@tabler/icons-react";
-import { Theme, themes } from "@/utils/themes";
+import { themes } from "@/utils/themes";
 import { cn } from "@/utils/cn";
 
 interface ThemeDropdownProps {
