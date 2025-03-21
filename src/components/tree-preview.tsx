@@ -1,13 +1,11 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef } from "react";
 import { Card } from "./card";
 import { FileTree } from "./file-tree";
 import { FileTreeItem } from "./file-tree-item";
 import type { FileTreeItem as FileTreeItemType } from "@/types/file-tree-item";
 import { cn } from "@/utils/cn";
-import { IconDownload, IconSun, IconMoon } from "@tabler/icons-react";
+import { IconDownload } from "@tabler/icons-react";
 import domtoimage from "dom-to-image";
-import { ThemeDropdown } from "./theme-dropdown";
-import { themes } from "@/utils/themes";
 
 interface TreePreviewProps {
   parsedItems: FileTreeItemType[];
@@ -15,53 +13,6 @@ interface TreePreviewProps {
 
 export function TreePreview({ parsedItems }: TreePreviewProps) {
   const fileTreeRef = useRef<HTMLDivElement>(null);
-  const [currentTheme, setCurrentTheme] = useState("default");
-  const [darkMode, setDarkMode] = useState(false);
-  
-  // Load theme preference and dark mode from localStorage on component mount
-  useEffect(() => {
-    // Load saved theme
-    const savedTheme = localStorage.getItem("treeTheme");
-    if (savedTheme && themes.some(t => t.id === savedTheme)) {
-      setCurrentTheme(savedTheme);
-    }
-    
-    // Load dark mode setting
-    if (typeof window !== "undefined") {
-      // Check local storage first
-      const savedTheme = localStorage.getItem("theme");
-
-      // If there's a saved preference, use that
-      if (savedTheme) {
-        const isDark = savedTheme === "dark";
-        setDarkMode(isDark);
-      } else {
-        // Otherwise use system preference
-        const isDarkMode = window.matchMedia(
-          "(prefers-color-scheme: dark)"
-        ).matches;
-        setDarkMode(isDarkMode);
-      }
-    }
-  }, []);
-  
-  // Toggle dark mode
-  const toggleDarkMode = () => {
-    const newDarkMode = !darkMode;
-    setDarkMode(newDarkMode);
-    document.documentElement.classList.toggle("dark", newDarkMode);
-    // Save preference to localStorage
-    localStorage.setItem("theme", newDarkMode ? "dark" : "light");
-  };
-  
-  // Save theme preference to localStorage when it changes
-  const handleThemeChange = (themeId: string) => {
-    setCurrentTheme(themeId);
-    localStorage.setItem("treeTheme", themeId);
-  };
-  
-  // Get current theme object
-  const theme = themes.find(t => t.id === currentTheme) || themes[0];
 
   const hasTooltip = (items: FileTreeItemType[]): boolean => {
     return !!items.some(
@@ -104,60 +55,28 @@ export function TreePreview({ parsedItems }: TreePreviewProps) {
       <div className="relative w-full">
         <div className="flex items-end justify-between pb-2">
           <p className="text-gray-600 dark:text-gray-400">Tree preview:</p>
-          <div className="flex items-center gap-2">
-            <ThemeDropdown currentTheme={currentTheme} setTheme={handleThemeChange} />
-            <button
-              onClick={toggleDarkMode}
-              className="p-2 rounded-md shadow-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800 transition-colors flex items-center gap-1"
-              title={darkMode ? "Switch to light mode" : "Switch to dark mode"}
-            >
-              {darkMode ? (
-                <IconSun className="h-4 w-4" />
-              ) : (
-                <IconMoon className="h-4 w-4" />
-              )}
-              <span className="text-sm">{darkMode ? "Light" : "Dark"}</span>
-            </button>
-            <button
-              onClick={exportAsImage}
-              className="p-2 rounded-md shadow-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800 transition-colors flex items-center gap-1"
-              title="Export as PNG image"
-            >
-              <IconDownload className="h-4 w-4" />
-              <span className="text-sm">Export</span>
-            </button>
-          </div>
+          <button
+            onClick={exportAsImage}
+            className="p-2 rounded-md shadow-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800 transition-colors flex items-center gap-1"
+            title="Export as PNG image"
+          >
+            <IconDownload className="h-4 w-4" />
+            <span className="text-sm">Export as image</span>
+          </button>
         </div>
-        <div className={cn("border rounded-md overflow-hidden", theme.borderColor)}>
+        <div className="border border-gray-100 dark:border-gray-100/10">
           <div
-            className={cn("p-10 w-full", theme.previewBackground)}
+            className="p-10 bg-white dark:bg-gray-900 w-full"
             ref={fileTreeRef}
           >
             <Card
               className={cn({
                 "md:w-[calc(50%-1rem)] max-md:w-full": hasTooltip(parsedItems),
               })}
-              themeBackground={theme.cardBackground}
-              themeText={theme.textColor}
-              themeBorder={theme.borderColor}
-              themeShadow={theme.cardShadow}
             >
-              <FileTree dividerColor={theme.dividerColor}>
+              <FileTree>
                 {parsedItems.map((item, index) => (
-                  <FileTreeItem 
-                    key={index} 
-                    item={item} 
-                    selectionDotColor={theme.selectionDotColor}
-                    themeBackground={theme.cardBackground}
-                    themeText={theme.textColor}
-                    themeBorder={theme.borderColor}
-                    themeShadow={theme.cardShadow}
-                    dividerColor={theme.dividerColor}
-                    iconColor={theme.iconColor}
-                    itemHoverEffect={theme.itemHoverEffect}
-                    disabledBackground={theme.disabledBackground}
-                    disabledOpacity={theme.disabledOpacity}
-                  />
+                  <FileTreeItem key={index} item={item} />
                 ))}
               </FileTree>
             </Card>
