@@ -13,9 +13,29 @@ import { FileTree } from "./file-tree";
 export function FileTreeItem({
   item,
   indent = 0,
+  selectionDotColor,
+  themeBackground,
+  themeText,
+  themeBorder,
+  themeShadow,
+  dividerColor,
+  iconColor,
+  itemHoverEffect,
+  disabledBackground,
+  disabledOpacity,
 }: {
   item: FileTreeItemType;
   indent?: number;
+  selectionDotColor?: string;
+  themeBackground?: string;
+  themeText?: string;
+  themeBorder?: string;
+  themeShadow?: string;
+  dividerColor?: string;
+  iconColor?: string;
+  itemHoverEffect?: string;
+  disabledBackground?: string;
+  disabledOpacity?: string;
 }) {
   return (
     <>
@@ -29,15 +49,16 @@ export function FileTreeItem({
             "pl-20": indent === 5,
             "pl-24": indent === 6,
             "pl-28": indent === 7,
-            "bg-gray-100/90 dark:bg-gray-800/60": item.isDisabled,
+            [disabledBackground || "bg-gray-100/90 dark:bg-gray-800/60"]: item.isDisabled,
             "font-semibold": item.isBold,
           })}
         >
           <div
             className={cn(
-              "py-2 px-3 pr-10 flex items-center relative gap-2 leading-normal",
+              "py-2 px-3 pr-10 flex items-center relative gap-2 leading-normal rounded-md transition-colors",
+              itemHoverEffect || "hover:bg-gray-50/50 dark:hover:bg-gray-800/50",
               {
-                "opacity-20": item.isDisabled,
+                [disabledOpacity || "opacity-20"]: item.isDisabled,
               }
             )}
           >
@@ -47,13 +68,18 @@ export function FileTreeItem({
                 switch (item.icon) {
                   case "function":
                     return (
-                      <IconFunction stroke={item.isBold ? 1.5 : 1} size={20} />
+                      <IconFunction 
+                        stroke={item.isBold ? 1.5 : 1} 
+                        size={20} 
+                        className={item.isDisabled ? "" : iconColor} 
+                      />
                     );
                   case "folder":
                     return (
                       <IconFolderOpen
                         stroke={item.isBold ? 1.5 : 1}
                         size={20}
+                        className={item.isDisabled ? "" : iconColor}
                       />
                     );
                   case "layout":
@@ -61,12 +87,17 @@ export function FileTreeItem({
                       <IconLayoutSidebar
                         stroke={item.isBold ? 1.5 : 1}
                         size={20}
+                        className={item.isDisabled ? "" : iconColor}
                       />
                     );
                   case "file":
                   default:
                     return (
-                      <IconFile stroke={item.isBold ? 1.5 : 1} size={20} />
+                      <IconFile 
+                        stroke={item.isBold ? 1.5 : 1} 
+                        size={20} 
+                        className={item.isDisabled ? "" : iconColor} 
+                      />
                     );
                 }
               }
@@ -74,19 +105,29 @@ export function FileTreeItem({
               // If no icon but has children, use folder icon
               if (item.children?.length) {
                 return (
-                  <IconFolderOpen stroke={item.isBold ? 1.5 : 1} size={20} />
+                  <IconFolderOpen 
+                    stroke={item.isBold ? 1.5 : 1} 
+                    size={20} 
+                    className={item.isDisabled ? "" : iconColor} 
+                  />
                 );
               }
 
               // Default to file icon
-              return <IconFile stroke={item.isBold ? 1.5 : 1} size={20} />;
+              return (
+                <IconFile 
+                  stroke={item.isBold ? 1.5 : 1} 
+                  size={20} 
+                  className={item.isDisabled ? "" : iconColor} 
+                />
+              );
             })()}
 
             {item.name}
 
             {item.isSelected && (
               <div className="absolute right-2 top-1/2 -translate-y-1/2">
-                <div className="h-2 w-2 rounded-full bg-sky-500 " />
+                <div className={cn("h-2 w-2 rounded-full", selectionDotColor || "bg-sky-500")} />
               </div>
             )}
           </div>
@@ -94,7 +135,13 @@ export function FileTreeItem({
           {item.tooltip && (
             <div className="hidden md:flex absolute left-[calc(100%+1rem)] w-[calc(100%+1rem)] items-center gap-4 inset-y-0 text-gray-400 dark:text-gray-600">
               <IconArrowNarrowRight stroke={1} />
-              <Card className="w-full">
+              <Card 
+                className="w-full"
+                themeBackground={themeBackground}
+                themeText={themeText}
+                themeBorder={themeBorder}
+                themeShadow={themeShadow}
+              >
                 <div className="text-sm py-2 px-3 flex items-center gap-2">
                   {item.tooltip}
                 </div>
@@ -105,9 +152,23 @@ export function FileTreeItem({
       </li>
       {item.children && (
         <li>
-          <FileTree>
+          <FileTree dividerColor={dividerColor}>
             {item.children.map((child, index) => (
-              <FileTreeItem key={index} item={child} indent={indent + 1} />
+              <FileTreeItem 
+                key={index} 
+                item={child} 
+                indent={indent + 1} 
+                selectionDotColor={selectionDotColor}
+                themeBackground={themeBackground}
+                themeText={themeText}
+                themeBorder={themeBorder}
+                themeShadow={themeShadow}
+                dividerColor={dividerColor}
+                iconColor={iconColor}
+                itemHoverEffect={itemHoverEffect}
+                disabledBackground={disabledBackground}
+                disabledOpacity={disabledOpacity}
+              />
             ))}
           </FileTree>
         </li>
