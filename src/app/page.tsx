@@ -209,7 +209,7 @@ export default function Home() {
         />
       </div>
 
-      <div className="flex flex-col gap-8 items-center justify-center font-[family-name:var(--font-geist-sans)]">
+      <div className="flex flex-col gap-8 items-stretch justify-center">
         {/* Header */}
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center py-20 lg:pt-32 lg:pb-24">
@@ -225,7 +225,7 @@ export default function Home() {
         </div>
 
         {/* Main content area */}
-        <div className="flex flex-col lg:flex-row w-full max-w-7xl items-start p-4 gap-8">
+        <div className="flex flex-col lg:flex-row w-full max-w-7xl items-stretch lg:items-start mx-auto p-4 gap-8">
           {/* Left panel - Code editor */}
           <div className="lg:w-1/2 min-h-screen flex flex-col pt-0.5">
             <div className="flex items-end justify-between">

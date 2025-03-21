@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { IconPalette } from "@tabler/icons-react";
-import { themes } from "@/utils/themes";
+import { Theme, themes } from "@/utils/themes";
 import { cn } from "@/utils/cn";
 
 interface ThemeDropdownProps {
@@ -20,10 +20,7 @@ export function ThemeDropdown({ currentTheme, setTheme }: ThemeDropdownProps) {
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };
@@ -32,8 +29,7 @@ export function ThemeDropdown({ currentTheme, setTheme }: ThemeDropdownProps) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const currentThemeObj =
-    themes.find((theme) => theme.id === currentTheme) || themes[0];
+  const currentThemeObj = themes.find(theme => theme.id === currentTheme) || themes[0];
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -45,7 +41,7 @@ export function ThemeDropdown({ currentTheme, setTheme }: ThemeDropdownProps) {
         <IconPalette className="h-4 w-4" />
         <span className="text-sm">Theme: {currentThemeObj.name}</span>
       </button>
-
+      
       {isOpen && (
         <div className="absolute right-0 mt-2 z-20 min-w-[180px] bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 py-1">
           {themes.map((theme) => (
