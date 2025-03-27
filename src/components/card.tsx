@@ -1,3 +1,4 @@
+import { Card as ShadcnCard, CardContent } from "@/components/ui/card";
 import { cn } from "@/utils/cn";
 
 export function Card({
@@ -16,9 +17,9 @@ export function Card({
   themeShadow?: string;
 }) {
   return (
-    <div
+    <ShadcnCard
       className={cn(
-        "rounded-lg border dynamic-last-child-round relative",
+        "relative",
         themeBorder || "border-gray-400/30",
         themeShadow || "shadow-xl",
         themeBackground || "bg-white dark:bg-gray-900",
@@ -27,7 +28,7 @@ export function Card({
         className
       )}
     >
-      {children}
-    </div>
+      <CardContent className="p-0">{children}</CardContent>
+    </ShadcnCard>
   );
 }

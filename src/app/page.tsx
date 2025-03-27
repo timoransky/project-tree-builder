@@ -3,27 +3,26 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { IconBrandGithub } from "@tabler/icons-react";
-
+import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import type { FileTreeItem as FileTreeItemType } from "@/types/file-tree-item";
-import { InputTabs, InputTabType } from "@/components/input-tabs";
+import { InputTabs } from "@/components/input-tabs";
 import { CodeEditor } from "@/components/code-editor";
 import { TreePreview } from "@/components/tree-preview";
 import { HelpPopup } from "@/components/help-popup";
 import { ThemeSwitch } from "@/components/theme-switch";
 import { Footer } from "@/components/footer";
-import {
-  jsonExample,
-  htmlExample,
-  markdownExample,
-} from "@/components/constants";
-import { parseMarkdownToFileTree } from "@/utils/markdown-parser";
+import { parsers, getParser } from "@/parsers";
 
 export default function Home() {
   const [darkMode, setDarkMode] = useState(false);
-  const [activeTab, setActiveTab] = useState<InputTabType>("json");
-  const [jsonInput, setJsonInput] = useState(jsonExample);
-  const [htmlInput, setHtmlInput] = useState(htmlExample);
-  const [markdownInput, setMarkdownInput] = useState(markdownExample);
+  const [activeTab, setActiveTab] = useState<string>("json");
+  const [inputs, setInputs] = useState<Record<string, string>>({});
   const [parsedItems, setParsedItems] = useState<FileTreeItemType[]>([]);
   const [error, setError] = useState<string>("");
 
@@ -49,8 +48,17 @@ export default function Home() {
     }
   }, []);
 
+  // Initialize with examples
   useEffect(() => {
-    handleJsonInput(jsonExample);
+    // Initialize inputs with examples for each parser
+    const initialInputs: Record<string, string> = {};
+    parsers.forEach((parser) => {
+      initialInputs[parser.id] = parser.example;
+    });
+    setInputs(initialInputs);
+
+    // Parse the initial input (JSON by default)
+    handleParserInput("json", parsers[0].example);
   }, []);
 
   const toggleDarkMode = () => {
@@ -61,138 +69,64 @@ export default function Home() {
     localStorage.setItem("theme", newDarkMode ? "dark" : "light");
   };
 
-  const convertToValidJSON = (str: string): string => {
-    // Add quotes to unquoted keys
-    return str.replace(/([{,]\s*)([a-zA-Z0-9_]+)\s*:/g, '$1"$2":');
-  };
+  const handleParserInput = (parserId: string, value: string) => {
+    // Update the input state
+    setInputs((prev) => ({
+      ...prev,
+      [parserId]: value,
+    }));
 
-  const handleJsonInput = (value: string) => {
-    setJsonInput(value);
     try {
-      // Preprocess the input before parsing
-      const validJSON = convertToValidJSON(value);
-      const parsed = JSON.parse(validJSON);
-
-      if (Array.isArray(parsed)) {
-        setParsedItems(parsed);
-        setError("");
-      } else {
-        setParsedItems([]);
-        setError("Input must be an array");
-      }
-    } catch (e: unknown) {
-      console.log(e);
-      setError("Invalid JSON format");
-    }
-  };
-
-  const handleHtmlInput = (value: string) => {
-    setHtmlInput(value);
-    try {
-      // Parse HTML to FileTreeItemType structure
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(value, "text/html");
-      const rootList = doc.querySelector("ul");
-
-      if (!rootList) {
-        setError("Invalid HTML format. Need a <ul> element");
-        setParsedItems([]);
+      // Get the parser and parse the input
+      const parser = getParser(parserId);
+      if (!parser) {
+        setError(`Parser not found: ${parserId}`);
         return;
       }
 
-      const parsed = parseHtmlListToFileTree(rootList);
+      const parsed = parser.parse(value);
       setParsedItems(parsed);
       setError("");
     } catch (e: unknown) {
       console.log(e);
-      setError("Invalid HTML format");
+      const errorMessage = e instanceof Error ? e.message : "Unknown error";
+      setError(errorMessage);
     }
   };
 
-  const handleMarkdownInput = (value: string) => {
-    setMarkdownInput(value);
-    try {
-      const parsed = parseMarkdownToFileTree(value);
+  const applyExample = (parserId: string) => {
+    const parser = getParser(parserId);
+    if (!parser) return;
 
-      if (parsed.length > 0) {
-        setParsedItems(parsed);
-        setError("");
-      } else {
-        setParsedItems([]);
-        setError(
-          "Could not parse Markdown. Make sure to use * or - or + for list items."
-        );
-      }
-    } catch (e: unknown) {
-      console.log(e);
-      setError("Invalid Markdown format");
-    }
-  };
-
-  const parseHtmlListToFileTree = (ul: HTMLElement): FileTreeItemType[] => {
-    const items: FileTreeItemType[] = [];
-
-    ul.querySelectorAll(":scope > li").forEach((li) => {
-      const item: FileTreeItemType = {
-        name: li.childNodes[0].textContent?.trim() || "",
-      };
-
-      // Check for classes and attributes
-      if (li.classList.contains("selected")) {
-        item.isSelected = true;
-      }
-      if (li.classList.contains("disabled")) {
-        item.isDisabled = true;
-      }
-      if (li.hasAttribute("title")) {
-        item.tooltip = li.getAttribute("title") || undefined;
-      }
-
-      // Check for bold text
-      const strongElement = li.querySelector(":scope > strong");
-      if (strongElement) {
-        item.isBold = true;
-        item.name = strongElement.textContent?.trim() || "";
-      }
-
-      // Check for nested lists
-      const nestedUl = li.querySelector(":scope > ul");
-      if (nestedUl) {
-        item.children = parseHtmlListToFileTree(nestedUl as HTMLElement);
-      }
-
-      items.push(item);
-    });
-
-    return items;
-  };
-
-  const applyJsonExample = () => {
-    setActiveTab("json");
-    handleJsonInput(jsonExample);
-  };
-
-  const applyHtmlExample = () => {
-    setActiveTab("html");
-    handleHtmlInput(htmlExample);
-  };
-
-  const applyMarkdownExample = () => {
-    setActiveTab("markdown");
-    handleMarkdownInput(markdownExample);
+    setActiveTab(parserId);
+    handleParserInput(parserId, parser.example);
   };
 
   return (
     <div className="relative isolate pt-14">
       <div className="absolute top-6 right-6 flex gap-6 items-center">
         <ThemeSwitch darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
-        <Link
-          href="https://github.com/timoransky/project-tree-builder"
-          target="_blank"
-          className="text-gray-900 dark:text-gray-200 hover:text-teal-500 dark:hover:text-teal-400 transition-colors"
-        >
-          <IconBrandGithub className="h-7 w-7" />
-        </Link>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                asChild
+                className="text-gray-900 dark:text-gray-200 hover:text-teal-500 dark:hover:text-teal-400 transition-colors [&_svg]:size-6"
+              >
+                <Link
+                  href="https://github.com/timoransky/project-tree-builder"
+                  target="_blank"
+                >
+                  <IconBrandGithub className="h-5 w-5" />
+                  <span className="sr-only">GitHub Repository</span>
+                </Link>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>View on GitHub</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
 
       {/* Background decoration */}
@@ -227,29 +161,17 @@ export default function Home() {
         {/* Main content area */}
         <div className="flex flex-col lg:flex-row w-full max-w-7xl items-stretch lg:items-start mx-auto p-4 gap-8">
           {/* Left panel - Code editor */}
-          <div className="lg:w-1/2 min-h-screen flex flex-col pt-0.5">
-            <div className="flex items-end justify-between">
+          <div className="lg:w-1/2 min-h-screen flex flex-col">
+            <div className="flex items-center justify-between">
               <InputTabs activeTab={activeTab} setActiveTab={setActiveTab} />
-              <HelpPopup
-                activeTab={activeTab}
-                jsonExample={jsonExample}
-                htmlExample={htmlExample}
-                markdownExample={markdownExample}
-                applyJsonExample={applyJsonExample}
-                applyHtmlExample={applyHtmlExample}
-                applyMarkdownExample={applyMarkdownExample}
-              />
+              <HelpPopup activeTab={activeTab} applyExample={applyExample} />
             </div>
 
             <CodeEditor
               activeTab={activeTab}
-              jsonInput={jsonInput}
-              htmlInput={htmlInput}
-              markdownInput={markdownInput}
+              inputs={inputs}
               error={error}
-              onJsonChange={handleJsonInput}
-              onHtmlChange={handleHtmlInput}
-              onMarkdownChange={handleMarkdownInput}
+              onInputChange={handleParserInput}
             />
           </div>
 
