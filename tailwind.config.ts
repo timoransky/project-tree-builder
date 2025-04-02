@@ -57,6 +57,33 @@ export default {
           "5": "hsl(var(--chart-5))",
         },
       },
+      // Add gradient color variables
+      backgroundColor: {
+        "primary-gradient":
+          "color-mix(in oklab, hsl(265, 89%, 64%) calc(<alpha-value> * 100%), transparent)",
+        "secondary-gradient":
+          "color-mix(in oklab, hsl(173, 80%, 40%) calc(<alpha-value> * 100%), transparent)",
+      },
+      keyframes: {
+        "accordion-down": {
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
+        },
+        "accordion-up": {
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
+        float: {
+          "0%, 100%": { transform: "translateX(-33.333%) translateY(-25%)" },
+          "30%": { transform: "translateX(-80%) translateY(-25%)" },
+          "70%": { transform: "translateX(0%) translateY(-25%)" },
+        },
+      },
+      animation: {
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
+        float: "float 30s linear infinite",
+      },
     },
   },
   plugins: [
